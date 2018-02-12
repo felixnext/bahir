@@ -31,33 +31,33 @@ else:
 from pyspark.context import SparkConf, SparkContext, RDD
 from pyspark.streaming.context import StreamingContext
 from pyspark.streaming.tests import PySparkStreamingTestCase
-from mqtt import MQTTUtils
+from zeromq import ZeroMQUtils
 
-class MQTTStreamTests(PySparkStreamingTestCase):
+class ZeroMQStreamTests(PySparkStreamingTestCase):
     timeout = 20  # seconds
     duration = 1
 
     def setUp(self):
-        super(MQTTStreamTests, self).setUp()
+        super(ZeroMQStreamTests, self).setUp()
 
-        MQTTTestUtilsClz = self.ssc._jvm.java.lang.Thread.currentThread().getContextClassLoader() \
-            .loadClass("org.apache.spark.streaming.mqtt.MQTTTestUtils")
-        self._MQTTTestUtils = MQTTTestUtilsClz.newInstance()
-        self._MQTTTestUtils.setup()
+        ZeroMQTestUtilsClz = self.ssc._jvm.java.lang.Thread.currentThread().getContextClassLoader() \
+            .loadClass("org.apache.spark.streaming.zeromq.ZeroMQTestUtils")
+        self._ZeroMQTestUtils = ZeroMQTestUtilsClz.newInstance()
+        self._ZeroMQTestUtils.setup()
 
     def tearDown(self):
-        if self._MQTTTestUtils is not None:
-            self._MQTTTestUtils.teardown()
-            self._MQTTTestUtils = None
+        if self._ZeroMQTestUtils is not None:
+            self._ZeroMQTestUtils.teardown()
+            self._ZeroMQTestUtils = None
 
-        super(MQTTStreamTests, self).tearDown()
+        super(ZeroMQStreamTests, self).tearDown()
 
     def _randomTopic(self):
         return "topic-%d" % random.randint(0, 10000)
 
     def _startContext(self, topic):
         # Start the StreamingContext and also collect the result
-        stream = MQTTUtils.createStream(self.ssc, "tcp://" + self._MQTTTestUtils.brokerUri(), topic)
+        stream = ZeroMQUtils.createStream(self.ssc, "tcp://" + self._ZeroMQTestUtils.publisherUri(), topic)
         result = []
 
         def getOutput(_, rdd):
@@ -68,14 +68,14 @@ class MQTTStreamTests(PySparkStreamingTestCase):
         self.ssc.start()
         return result
 
-    def test_mqtt_stream(self):
-        """Test the Python MQTT stream API."""
-        sendData = "MQTT demo for spark streaming"
+    def test_zeromq_stream(self):
+        """Test the Python ZeroMQ stream API."""
+        sendData = "ZeroMQ demo for spark streaming"
         topic = self._randomTopic()
         result = self._startContext(topic)
 
         def retry():
-            self._MQTTTestUtils.publishData(topic, sendData)
+            self._ZeroMQTestUtils.publishData(topic, sendData)
             # Because "publishData" sends duplicate messages, here we should use > 0
             self.assertTrue(len(result) > 0)
             self.assertEqual(sendData, result[0])
@@ -83,8 +83,9 @@ class MQTTStreamTests(PySparkStreamingTestCase):
         # Retry it because we don't know when the receiver will start.
         self._retry_or_timeout(retry)
 
+    '''
     def _start_context_with_paired_stream(self, topics):
-        stream = MQTTUtils.createPairedStream(self.ssc, "tcp://" + self._MQTTTestUtils.brokerUri(), topics)
+        stream = MQTTUtils.createPairedStream(self.ssc, "tcp://" + self._ZeroMQTestUtils.publisherUri(), topics)
         # Keep a set because records can potentially be repeated.
         result = set()
 
@@ -111,6 +112,7 @@ class MQTTStreamTests(PySparkStreamingTestCase):
 
         # Retry it because we don't know when the receiver will start.
         self._retry_or_timeout(retry)
+    '''
 
     def _retry_or_timeout(self, test_func):
         start_time = time.time()

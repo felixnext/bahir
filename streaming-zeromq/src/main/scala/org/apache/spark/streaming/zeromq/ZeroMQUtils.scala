@@ -28,7 +28,7 @@ import org.apache.spark.api.java.function.{Function => JFunction, Function0 => J
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.akka.{ActorReceiver, AkkaUtils}
-import org.apache.spark.streaming.api.java.{JavaReceiverInputDStream, JavaStreamingContext}
+import org.apache.spark.streaming.api.java.{JavaDStream, JavaReceiverInputDStream, JavaStreamingContext}
 import org.apache.spark.streaming.dstream.ReceiverInputDStream
 
 object ZeroMQUtils {
@@ -175,9 +175,16 @@ private[zeromq] class ZeroMQUtilsPythonHelper {
       storageLevel: StorageLevel
     ): JavaDStream[String] = {
     def bytesToStringIterator(x: Seq[ByteString]): Iterator[String] = x.map(_.utf8String).iterator
-    ZeroMQUtils.createStream[String](jssc.ssc, publisherUrl, Subscribe(topic), bytesToStringIterator _, storageLevel)
+    ZeroMQUtils.createStream[String](
+      jssc.ssc,
+      publisherUrl,
+      Subscribe(topic),
+      bytesToStringIterator _,
+      storageLevel)
   }
-  /*def createPairedStream(
+
+  /*
+  def createPairedStream(
       jssc: JavaStreamingContext,
       publisherUrl: String,
       topics: Array[String],
@@ -193,5 +200,6 @@ private[zeromq] class ZeroMQUtilsPythonHelper {
       storageLevel: StorageLevel
       ): JavaDStream[(String, Array[Byte])] = {
     MQTTUtils.createPairedByteArrayStream(jssc, brokerUrl, topics, storageLevel)
-  }*/
+  }
+  */
 }
