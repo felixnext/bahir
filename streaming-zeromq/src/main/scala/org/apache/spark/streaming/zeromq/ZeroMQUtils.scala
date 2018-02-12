@@ -161,3 +161,37 @@ object ZeroMQUtils {
       fn)
   }
 }
+
+/**
+ * This is a helper class that wraps the methods in ZeroMQUtils into more Python-friendly class and
+ * function so that it can be easily instantiated and called from Python's ZeroMQUtils.
+ */
+private[zeromq] class ZeroMQUtilsPythonHelper {
+
+  def createStream(
+      jssc: JavaStreamingContext,
+      publisherUrl: String,
+      topic: String,
+      storageLevel: StorageLevel
+    ): JavaDStream[String] = {
+    def bytesToStringIterator(x: Seq[ByteString]): Iterator[String] = x.map(_.utf8String).iterator
+    ZeroMQUtils.createStream[String](jssc.ssc, publisherUrl, Subscribe(topic), bytesToStringIterator _, storageLevel)
+  }
+  /*def createPairedStream(
+      jssc: JavaStreamingContext,
+      publisherUrl: String,
+      topics: Array[String],
+      storageLevel: StorageLevel
+    ): JavaDStream[(String, String)] = {
+    MQTTUtils.createPairedStream(jssc, brokerUrl, topics, storageLevel)
+  }
+
+  def createPairedByteArrayStream(
+      jssc: JavaStreamingContext,
+      brokerUrl: String,
+      topics: Array[String],
+      storageLevel: StorageLevel
+      ): JavaDStream[(String, Array[Byte])] = {
+    MQTTUtils.createPairedByteArrayStream(jssc, brokerUrl, topics, storageLevel)
+  }*/
+}

@@ -23,3 +23,6 @@ target/
 .fbExcludeFilterFile
 dependency-reduced-pom.xml
 checkpoint
+
+# Atom
+.ropeproject
