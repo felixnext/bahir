@@ -168,6 +168,7 @@ object ZeroMQUtils {
  */
 private[zeromq] class ZeroMQUtilsPythonHelper {
 
+  /*
   def createStream(
       jssc: JavaStreamingContext,
       publisherUrl: String,
@@ -181,6 +182,20 @@ private[zeromq] class ZeroMQUtilsPythonHelper {
       Subscribe(topic),
       bytesToStringIterator _,
       storageLevel)
+  }
+  */
+
+  def createStream(
+      jssc: JavaStreamingContext,
+      publisherUrl: String,
+      topic: String
+    ): JavaDStream[String] = {
+    def bytesToStringIterator(x: Seq[ByteString]): Iterator[String] = x.map(_.utf8String).iterator
+    ZeroMQUtils.createStream[String](
+      jssc.ssc,
+      publisherUrl,
+      Subscribe(topic),
+      bytesToStringIterator _)
   }
 
   /*
