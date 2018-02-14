@@ -24,12 +24,12 @@
  (1) Run the publisher:
 
     `$ bin/run-example \
-      org.apache.spark.examples.streaming.zeromq.ZeroMQPublisher tcp://localhost:1883 foo`
+      org.apache.spark.examples.streaming.zeromq.SimpleZeroMQPublisher tcp://localhost:1234 foo`
 
  (2) Run the example:
 
     `$ bin/run-example \
-      streaming-zeromq/examples/src/main/python/streaming/zeromq_wordcount.py tcp://localhost:1883 foo`
+      streaming-zeromq/examples/src/main/python/streaming/zeromq_wordcount.py tcp://localhost:1234 foo`
 """
 
 import sys

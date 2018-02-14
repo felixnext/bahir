@@ -168,34 +168,27 @@ object ZeroMQUtils {
  */
 private[zeromq] class ZeroMQUtilsPythonHelper {
 
-  /*
+  // def bytesToStringIterator(x: Seq[ByteString]): Iterator[String] = x.map(_.utf8String).iterator
+
+  class BytesToString extends JFunction[Array[Array[Byte]], java.lang.Iterable[String]] {
+    def call(bytes: Array[Array[Byte]]): java.lang.Iterable[String] = {
+      bytes.map(x => "test").toIterable.asJava
+    }
+  }
+
   def createStream(
       jssc: JavaStreamingContext,
       publisherUrl: String,
       topic: String,
       storageLevel: StorageLevel
     ): JavaDStream[String] = {
-    def bytesToStringIterator(x: Seq[ByteString]): Iterator[String] = x.map(_.utf8String).iterator
-    ZeroMQUtils.createStream[String](
-      jssc.ssc,
-      publisherUrl,
-      Subscribe(topic),
-      bytesToStringIterator _,
-      storageLevel)
-  }
-  */
 
-  def createStream(
-      jssc: JavaStreamingContext,
-      publisherUrl: String,
-      topic: String
-    ): JavaDStream[String] = {
-    def bytesToStringIterator(x: Seq[ByteString]): Iterator[String] = x.map(_.utf8String).iterator
     ZeroMQUtils.createStream[String](
-      jssc.ssc,
+      jssc,
       publisherUrl,
       Subscribe(topic),
-      bytesToStringIterator _)
+      new BytesToString(),
+      storageLevel)
   }
 
   /*

@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-#from py4j.java_gateway import Py4JJavaError
+#from py4j.protocol import Py4JJavaError
 
 from pyspark.storagelevel import StorageLevel
 from pyspark.serializers import UTF8Deserializer
@@ -42,14 +42,6 @@ class ZeroMQUtils(object):
         helper = ZeroMQUtils._get_helper(ssc._sc)
         jstream = helper.createStream(ssc._jssc, publisherUrl, topic, jlevel)
         return DStream(jstream, ssc, UTF8Deserializer())
-
-    @staticmethod
-    def _list_to_java_string_array(sc, list_):
-        len_arr = len(list_)
-        arr = sc._gateway.new_array(sc._jvm.String, len_arr)
-        for i in range(len_arr):
-            arr[i] = list_[i]
-        return arr
 
     @staticmethod
     def _get_helper(sc):
